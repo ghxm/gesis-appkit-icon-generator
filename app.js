@@ -16,7 +16,8 @@ class IconGenerator {
         this.resizeMode = document.getElementById('resizeMode');
         this.stretchMode = document.getElementById('stretchMode');
         this.cropMode = document.getElementById('cropMode');
-        this.generateBlackSquareBtn = document.getElementById('generateBlackSquare');
+        this.colorPicker = document.getElementById('colorPicker');
+        this.generateColorSquareBtn = document.getElementById('generateColorSquare');
         this.downloadBtn = document.getElementById('downloadResized');
         this.previewContainer = document.getElementById('previewContainer');
         this.noPreview = document.getElementById('noPreview');
@@ -44,7 +45,7 @@ class IconGenerator {
         this.cropMode.addEventListener('change', () => this.updatePreview());
 
         // Buttons
-        this.generateBlackSquareBtn.addEventListener('click', () => this.generateBlackSquare());
+        this.generateColorSquareBtn.addEventListener('click', () => this.generateColorSquare());
         this.downloadBtn.addEventListener('click', () => this.downloadImage());
     }
 
@@ -194,9 +195,10 @@ class IconGenerator {
         }
     }
 
-    generateBlackSquare() {
+    generateColorSquare() {
         const width = parseInt(this.widthInput.value);
         const height = parseInt(this.heightInput.value);
+        const color = this.colorPicker.value;
         
         const canvas = this.resizedCanvas;
         const ctx = canvas.getContext('2d');
@@ -204,8 +206,8 @@ class IconGenerator {
         canvas.width = width;
         canvas.height = height;
         
-        // Fill with black
-        ctx.fillStyle = '#000000';
+        // Fill with selected color
+        ctx.fillStyle = color;
         ctx.fillRect(0, 0, width, height);
         
         this.resizedDimensions.textContent = `${width} × ${height} px`;
@@ -290,7 +292,7 @@ class IconGenerator {
                         this.stretchMode.checked ? 'stretched' : 'resized';
             const filename = this.currentFile ? 
                 `${this.currentFile.name.split('.')[0]}_${mode}_${width}x${height}.png` :
-                `black_square_${width}x${height}.png`;
+                `color_square_${this.colorPicker.value.substring(1)}_${width}x${height}.png`;
             
             link.href = url;
             link.download = filename;
