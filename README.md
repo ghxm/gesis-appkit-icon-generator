@@ -11,6 +11,7 @@ Visit the application at: [https://ghxm.github.io/gesis-appkit-icon-generator/](
 - Drag-and-drop image upload (PNG, JPEG, SVG)
 - Resize to custom dimensions (default 1024x1024)
 - Keep aspect ratio option
+- Crop to exact size
 - Generate solid black squares
 - Real-time preview
 - One-click PNG download
@@ -32,8 +33,10 @@ cd gesis-appkit-icon-generator
 python -m http.server 8000  # or any local server
 ```
 
+## Disclaimer
+
+This is an independent tool created to help with icon generation and is **not an official GESIS service** or part of the official GESIS AppKit. It is a community-created utility that uses the GESIS name only to indicate its intended use case.
+
 ## License
 
 MIT License - see [LICENSE](LICENSE) file.
-
-Created for [GESIS](https://www.gesis.org/).
