@@ -14,6 +14,7 @@ class IconGenerator {
         this.widthInput = document.getElementById('widthInput');
         this.heightInput = document.getElementById('heightInput');
         this.keepAspectRatio = document.getElementById('keepAspectRatio');
+        this.cropMode = document.getElementById('cropMode');
         this.generateBlackSquareBtn = document.getElementById('generateBlackSquare');
         this.downloadBtn = document.getElementById('downloadResized');
         this.previewContainer = document.getElementById('previewContainer');
@@ -36,6 +37,7 @@ class IconGenerator {
         this.widthInput.addEventListener('input', () => this.handleDimensionChange('width'));
         this.heightInput.addEventListener('input', () => this.handleDimensionChange('height'));
         this.keepAspectRatio.addEventListener('change', () => this.updatePreview());
+        this.cropMode.addEventListener('change', () => this.updatePreview());
 
         // Buttons
         this.generateBlackSquareBtn.addEventListener('click', () => this.generateBlackSquare());
@@ -176,7 +178,69 @@ class IconGenerator {
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, targetWidth, targetHeight);
         
-        // Calculate scaling and positioning for centered image
+        if (this.cropMode.checked) {
+            // Crop mode: center crop to fill exact dimensions
+            this.cropToFit(ctx, img, targetWidth, targetHeight);
+        } else {
+            // Resize mode: fit image within dimensions
+            this.fitToSize(ctx, img, targetWidth, targetHeight);
+        }
+    }
+
+    generateBlackSquare() {
+        const width = parseInt(this.widthInput.value);
+        const height = parseInt(this.heightInput.value);
+        
+        const canvas = this.resizedCanvas;
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Fill with black
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, width, height);
+        
+        this.resizedDimensions.textContent = `${width} × ${height} px`;
+        this.showPreview();
+        this.enableDownloadButton();
+        
+        // Clear original image display
+        this.originalImageEl.src = '';
+        this.originalDimensions.textContent = '';
+        this.currentFile = null;
+        this.originalImage = null;
+    }
+
+    cropToFit(ctx, img, targetWidth, targetHeight) {
+        const imgAspectRatio = img.width / img.height;
+        const targetAspectRatio = targetWidth / targetHeight;
+        
+        let sourceX, sourceY, sourceWidth, sourceHeight;
+        
+        if (imgAspectRatio > targetAspectRatio) {
+            // Image is wider - crop sides
+            sourceHeight = img.height;
+            sourceWidth = img.height * targetAspectRatio;
+            sourceX = (img.width - sourceWidth) / 2;
+            sourceY = 0;
+        } else {
+            // Image is taller - crop top/bottom
+            sourceWidth = img.width;
+            sourceHeight = img.width / targetAspectRatio;
+            sourceX = 0;
+            sourceY = (img.height - sourceHeight) / 2;
+        }
+        
+        // Draw cropped image to fill entire canvas
+        ctx.drawImage(
+            img,
+            sourceX, sourceY, sourceWidth, sourceHeight,
+            0, 0, targetWidth, targetHeight
+        );
+    }
+    
+    fitToSize(ctx, img, targetWidth, targetHeight) {
         const imgAspectRatio = img.width / img.height;
         const targetAspectRatio = targetWidth / targetHeight;
         
@@ -208,31 +272,6 @@ class IconGenerator {
         ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
     }
 
-    generateBlackSquare() {
-        const width = parseInt(this.widthInput.value);
-        const height = parseInt(this.heightInput.value);
-        
-        const canvas = this.resizedCanvas;
-        const ctx = canvas.getContext('2d');
-        
-        canvas.width = width;
-        canvas.height = height;
-        
-        // Fill with black
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(0, 0, width, height);
-        
-        this.resizedDimensions.textContent = `${width} × ${height} px`;
-        this.showPreview();
-        this.enableDownloadButton();
-        
-        // Clear original image display
-        this.originalImageEl.src = '';
-        this.originalDimensions.textContent = '';
-        this.currentFile = null;
-        this.originalImage = null;
-    }
-
     downloadImage() {
         const canvas = this.resizedCanvas;
         
@@ -243,8 +282,9 @@ class IconGenerator {
             
             const width = parseInt(this.widthInput.value);
             const height = parseInt(this.heightInput.value);
+            const mode = this.cropMode.checked ? 'cropped' : 'resized';
             const filename = this.currentFile ? 
-                `${this.currentFile.name.split('.')[0]}_${width}x${height}.png` :
+                `${this.currentFile.name.split('.')[0]}_${mode}_${width}x${height}.png` :
                 `black_square_${width}x${height}.png`;
             
             link.href = url;
