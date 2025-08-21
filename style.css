@@ -1,8 +1,19 @@
 /* Custom styles for Gesis AppKit Icon Generator */
 
+/* GESIS Brand Colors */
+:root {
+    --gesis-primary: #2563eb;
+    --gesis-secondary: #64748b;
+    --gesis-accent: #0ea5e9;
+    --gesis-neutral: #f8fafc;
+    --gesis-text: #334155;
+    --gesis-text-light: #64748b;
+}
+
 /* Drop zone hover effects */
 #dropZone.drag-over {
-    @apply border-blue-500 bg-blue-50;
+    border-color: var(--gesis-primary);
+    background-color: var(--gesis-neutral);
 }
 
 /* Canvas styling */
