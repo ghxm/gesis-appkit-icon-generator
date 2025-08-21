@@ -30,7 +30,7 @@
         <!-- Header -->
         <header class="text-center mb-8">
             <h1 class="text-4xl font-bold text-gesis-text mb-2">GESIS AppKit Icon Generator</h1>
-            <p class="text-gesis-text-light">Upload, resize, and download images for your applications</p>
+            <p class="text-gesis-text-light">Upload, resize, and download images for your studies</p>
         </header>
 
         <!-- Main Content -->
@@ -96,16 +96,23 @@
                         </div>
                     </div>
 
-                    <!-- Options -->
-                    <div class="mb-6 space-y-3">
-                        <label class="flex items-center">
-                            <input type="checkbox" id="keepAspectRatio" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <span class="ml-2 text-sm text-gray-700">Keep aspect ratio</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" id="cropMode" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <span class="ml-2 text-sm text-gray-700">Crop to exact size</span>
-                        </label>
+                    <!-- Processing Mode -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Processing Mode</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="radio" name="processingMode" value="resize" id="resizeMode" checked class="text-gesis-primary focus:ring-gesis-primary">
+                                <span class="ml-2 text-sm text-gray-700">Resize (keep aspect ratio)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="processingMode" value="stretch" id="stretchMode" class="text-gesis-primary focus:ring-gesis-primary">
+                                <span class="ml-2 text-sm text-gray-700">Stretch (fill dimensions)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="processingMode" value="crop" id="cropMode" class="text-gesis-primary focus:ring-gesis-primary">
+                                <span class="ml-2 text-sm text-gray-700">Crop to exact size</span>
+                            </label>
+                        </div>
                     </div>
 
                     <!-- Action Buttons -->

@@ -13,7 +13,8 @@ class IconGenerator {
         this.resizedCanvas = document.getElementById('resizedCanvas');
         this.widthInput = document.getElementById('widthInput');
         this.heightInput = document.getElementById('heightInput');
-        this.keepAspectRatio = document.getElementById('keepAspectRatio');
+        this.resizeMode = document.getElementById('resizeMode');
+        this.stretchMode = document.getElementById('stretchMode');
         this.cropMode = document.getElementById('cropMode');
         this.generateBlackSquareBtn = document.getElementById('generateBlackSquare');
         this.downloadBtn = document.getElementById('downloadResized');
@@ -36,7 +37,10 @@ class IconGenerator {
         // Dimension inputs
         this.widthInput.addEventListener('input', () => this.handleDimensionChange('width'));
         this.heightInput.addEventListener('input', () => this.handleDimensionChange('height'));
-        this.keepAspectRatio.addEventListener('change', () => this.updatePreview());
+        
+        // Processing mode radio buttons
+        this.resizeMode.addEventListener('change', () => this.updatePreview());
+        this.stretchMode.addEventListener('change', () => this.updatePreview());
         this.cropMode.addEventListener('change', () => this.updatePreview());
 
         // Buttons
@@ -127,7 +131,7 @@ class IconGenerator {
     }
 
     updateDimensions() {
-        if (this.keepAspectRatio.checked && this.originalImage) {
+        if (this.resizeMode.checked && this.originalImage) {
             const aspectRatio = this.originalImage.width / this.originalImage.height;
             const currentWidth = parseInt(this.widthInput.value);
             const currentHeight = parseInt(this.heightInput.value);
@@ -142,7 +146,7 @@ class IconGenerator {
     }
 
     handleDimensionChange(changedDimension) {
-        if (this.keepAspectRatio.checked && this.originalImage) {
+        if (this.resizeMode.checked && this.originalImage) {
             const aspectRatio = this.originalImage.width / this.originalImage.height;
             
             if (changedDimension === 'width') {
@@ -181,9 +185,12 @@ class IconGenerator {
         if (this.cropMode.checked) {
             // Crop mode: center crop to fill exact dimensions
             this.cropToFit(ctx, img, targetWidth, targetHeight);
+        } else if (this.stretchMode.checked) {
+            // Stretch mode: fill entire canvas
+            this.stretchToFit(ctx, img, targetWidth, targetHeight);
         } else {
-            // Resize mode: fit image within dimensions
-            this.fitToSize(ctx, img, targetWidth, targetHeight);
+            // Resize mode: fit image within dimensions keeping aspect ratio
+            this.resizeToFit(ctx, img, targetWidth, targetHeight);
         }
     }
 
@@ -240,36 +247,33 @@ class IconGenerator {
         );
     }
     
-    fitToSize(ctx, img, targetWidth, targetHeight) {
+    resizeToFit(ctx, img, targetWidth, targetHeight) {
         const imgAspectRatio = img.width / img.height;
         const targetAspectRatio = targetWidth / targetHeight;
         
         let drawWidth, drawHeight, offsetX, offsetY;
         
-        if (this.keepAspectRatio.checked) {
-            if (imgAspectRatio > targetAspectRatio) {
-                // Image is wider than target
-                drawWidth = targetWidth;
-                drawHeight = targetWidth / imgAspectRatio;
-                offsetX = 0;
-                offsetY = (targetHeight - drawHeight) / 2;
-            } else {
-                // Image is taller than target
-                drawWidth = targetHeight * imgAspectRatio;
-                drawHeight = targetHeight;
-                offsetX = (targetWidth - drawWidth) / 2;
-                offsetY = 0;
-            }
-        } else {
-            // Stretch to fill
+        if (imgAspectRatio > targetAspectRatio) {
+            // Image is wider than target
             drawWidth = targetWidth;
-            drawHeight = targetHeight;
+            drawHeight = targetWidth / imgAspectRatio;
             offsetX = 0;
+            offsetY = (targetHeight - drawHeight) / 2;
+        } else {
+            // Image is taller than target
+            drawWidth = targetHeight * imgAspectRatio;
+            drawHeight = targetHeight;
+            offsetX = (targetWidth - drawWidth) / 2;
             offsetY = 0;
         }
         
         // Draw the image
         ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+    }
+    
+    stretchToFit(ctx, img, targetWidth, targetHeight) {
+        // Stretch image to fill entire canvas
+        ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
     }
 
     downloadImage() {
@@ -282,7 +286,8 @@ class IconGenerator {
             
             const width = parseInt(this.widthInput.value);
             const height = parseInt(this.heightInput.value);
-            const mode = this.cropMode.checked ? 'cropped' : 'resized';
+            const mode = this.cropMode.checked ? 'cropped' : 
+                        this.stretchMode.checked ? 'stretched' : 'resized';
             const filename = this.currentFile ? 
                 `${this.currentFile.name.split('.')[0]}_${mode}_${width}x${height}.png` :
                 `black_square_${width}x${height}.png`;
